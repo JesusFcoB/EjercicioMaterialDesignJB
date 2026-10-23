@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis tareas - Barreras</title>
+
+    <style>
+        :root {
+            --primario: #558b2f;
+            --sobre-primario: #ffffff;
+            --fondo: #f1f8e9;
+            --superficie: #dcedc8;
+            --texto: #1b2e05;
+            --borde: #689f38;
+            --peligro: #c62828;
+            --sobre-peligro: #ffffff;
+        }
+
+        body.modo-oscuro {
+            --primario: #0d5c4d;
+            --sobre-primario: #e8fff5;
+            --fondo: #0d1b2a;
+            --superficie: #1b2838;
+            --texto: #e0f2f1;
+            --borde: #4a6670;
+            --peligro: #cf6679;
+            --sobre-peligro: #1a1c1e;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: var(--fondo);
+            color: var(--texto);
+            font-family: Arial, sans-serif;
+            line-height: 1.5;
+        }
+
+        header {
+            padding: 28px 20px;
+            background: var(--primario);
+            color: var(--sobre-primario);
+        }
+
+        header div,
+        main {
+            width: min(100%, 760px);
+            margin: auto;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 2rem;
+        }
+
+        header p {
+            margin-bottom: 0;
+        }
+
+        main {
+            padding: 24px 16px;
+        }
+
+        .tarjeta {
+            margin-bottom: 24px;
+            padding: 24px;
+            border-radius: 24px;
+            background: var(--superficie);
+            box-shadow: 0 2px 8px #00000022;
+        }
+
+        body.modo-oscuro .tarjeta {
+            box-shadow: 0 2px 8px #00000055;
+        }
+
+        h2 {
+            margin-top: 0;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .campo {
+            margin-bottom: 12px;
+        }
+
+        .controles {
+            display: flex;
+            gap: 12px;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        select {
+            flex: 1;
+            min-width: 0;
+            padding: 14px;
+            border: 1px solid var(--borde);
+            border-radius: 8px;
+            background: var(--fondo);
+            color: var(--texto);
+            font: inherit;
+        }
+
+        button {
+            min-height: 48px;
+            padding: 12px 24px;
+            border: 0;
+            border-radius: 28px;
+            background: var(--primario);
+            color: var(--sobre-primario);
+            font: inherit;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            filter: brightness(0.9);
+        }
+
+        body.modo-oscuro button:hover {
+            filter: brightness(1.2);
+        }
+
+        input:focus-visible,
+        select:focus-visible,
+        button:focus-visible {
+            outline: 3px solid var(--primario);
+            outline-offset: 3px;
+        }
+
+        .btn-tema {
+            min-height: 40px;
+            padding: 8px 16px;
+            background: transparent;
+            color: var(--sobre-primario);
+            border: 2px solid var(--sobre-primario);
+            margin-top: 12px;
+        }
+
+        .btn-tema:hover {
+            background: var(--sobre-primario);
+            color: var(--primario);
+            filter: none;
+        }
+
+        .btn-tema:focus-visible {
+            outline-color: var(--sobre-primario);
+        }
+
+        .btn-eliminar-tarea,
+        .btn-editar-tarea {
+            min-height: 40px;
+            padding: 8px 16px;
+            flex-shrink: 0;
+        }
+
+        .btn-eliminar-tarea {
+            background: var(--peligro);
+            color: var(--sobre-peligro);
+        }
+
+        .btn-eliminar-tarea:focus-visible {
+            outline-color: var(--peligro);
+        }
+
+        .btn-editar-tarea {
+            background: transparent;
+            color: var(--primario);
+            border: 2px solid var(--primario);
+        }
+
+        .btn-editar-tarea:hover {
+            background: var(--primario);
+            color: var(--sobre-primario);
+            filter: none;
+        }
+
+        .btn-eliminar-completadas {
+            margin-top: 12px;
+            background: transparent;
+            color: var(--peligro);
+            border: 2px solid var(--peligro);
+        }
+
+        .btn-eliminar-completadas:hover {
+            background: var(--peligro);
+            color: var(--sobre-peligro);
+            filter: none;
+        }
+
+        .btn-eliminar-completadas:focus-visible {
+            outline-color: var(--peligro);
+        }
+
+        .filtros {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .filtros button {
+            min-height: 40px;
+            padding: 8px 16px;
+            background: transparent;
+            color: var(--primario);
+            border: 2px solid var(--primario);
+        }
+
+        .filtros button:hover {
+            background: var(--primario);
+            color: var(--sobre-primario);
+            filter: none;
+        }
+
+        .filtros button[aria-pressed="true"] {
+            background: var(--primario);
+            color: var(--sobre-primario);
+        }
+
+        ul {
+            padding: 0;
+            list-style: none;
+        }
+
+        .tarea {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+            padding: 16px;
+            border: 1px solid var(--borde);
+            border-radius: 16px;
+            animation: aparecer 0.25s ease;
+        }
+
+        .tarea.eliminando {
+            animation: desaparecer 0.25s ease forwards;
+        }
+
+        @keyframes aparecer {
+            from {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes desaparecer {
+            from {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            to {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+
+            .tarea,
+            .tarea.eliminando {
+                animation: none;
+            }
+        }
+
+        .tarea label {
+            flex: 1;
+            margin: 0;
+            overflow-wrap: anywhere;
+            font-weight: normal;
+            cursor: pointer;
+        }
+
+        .tarea input[type="checkbox"] {
+            width: 22px;
+            height: 22px;
+            accent-color: var(--primario);
+            flex-shrink: 0;
+        }
+
+        .completada label {
+            text-decoration: line-through;
+        }
+
+        .datos-tarea {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 4px;
+        }
+
+        .etiqueta-dato {
+            padding: 2px 10px;
+            border-radius: 12px;
+            background: var(--fondo);
+            border: 1px solid var(--borde);
+            font-size: 0.8rem;
+        }
+
+        .etiqueta-prioridad-alta {
+            border-color: #c62828;
+            color: #c62828;
+        }
+
+        .etiqueta-prioridad-media {
+            border-color: #ef6c00;
+            color: #ef6c00;
+        }
+
+        .etiqueta-prioridad-baja {
+            border-color: #2e7d32;
+            color: #2e7d32;
+        }
+
+        body.modo-oscuro .etiqueta-prioridad-alta {
+            color: #ef9a9a;
+            border-color: #ef9a9a;
+        }
+
+        body.modo-oscuro .etiqueta-prioridad-media {
+            color: #ffcc80;
+            border-color: #ffcc80;
+        }
+
+        body.modo-oscuro .etiqueta-prioridad-baja {
+            color: #a5d6a7;
+            border-color: #a5d6a7;
+        }
+
+        #mensaje {
+            min-height: 24px;
+            margin-bottom: 0;
+        }
+
+        .contadores {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px 24px;
+        }
+
+        @media (max-width: 500px) {
+            .controles {
+                flex-direction: column;
+            }
+
+            .tarea {
+                flex-wrap: wrap;
+            }
+
+            .btn-eliminar-tarea,
+            .btn-editar-tarea {
+                width: 100%;
+            }
+
+            .filtros button {
+                flex: 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div>
+            <h1>Mis tareas - Jesús Francisco Barreras Samaniego</h1>
+            <p>Organiza tus actividades académicas.</p>
+            <button type="button" class="btn-tema" id="toggle-tema" aria-pressed="false">
+                Modo oscuro
+            </button>
+        </div>
+    </header>
+
+    <main>
+        <section class="tarjeta">
+            <h2>Nueva tarea</h2>
+            <form id="formulario">
+                <div class="campo">
+                    <label for="nombre">Nombre de la tarea</label>
+                    <input type="text" id="nombre" placeholder="Ejemplo: estudiar JavaScript" maxlength="100" required>
+                </div>
+                <div class="campo">
+                    <label for="fecha">Fecha límite (opcional)</label>
+                    <input type="date" id="fecha">
+                </div>
+                <div class="campo">
+                    <label for="prioridad">Prioridad</label>
+                    <select id="prioridad">
+                        <option value="media" selected>Media</option>
+                        <option value="alta">Alta</option>
+                        <option value="baja">Baja</option>
+                    </select>
+                </div>
+                <button type="submit">Agregar tarea</button>
+            </form>
+            <p id="mensaje" role="status"></p>
+        </section>
+
+        <section class="tarjeta">
+            <h2>Lista de tareas</h2>
+            <div class="contadores">
+                <p id="contador-total" aria-live="polite">Total: 0</p>
+                <p id="contador" aria-live="polite">Pendientes: 0</p>
+                <p id="contador-completadas" aria-live="polite">Completadas: 0</p>
+            </div>
+            <div class="filtros" role="group" aria-label="Filtrar tareas">
+                <button type="button" data-filtro="todas" aria-pressed="true">Todas</button>
+                <button type="button" data-filtro="pendientes" aria-pressed="false">Pendientes</button>
+                <button type="button" data-filtro="completadas" aria-pressed="false">Completadas</button>
+            </div>
+            <p id="vacio">Todavía no tienes tareas.</p>
+            <ul id="lista"></ul>
+            <button type="button" class="btn-eliminar-completadas" id="eliminar-completadas" hidden>
+                Eliminar completadas
+            </button>
+        </section>
+    </main>
+
+    <script>
+        const formulario = document.querySelector("#formulario");
+        const nombre = document.querySelector("#nombre");
+        const fecha = document.querySelector("#fecha");
+        const prioridad = document.querySelector("#prioridad");
+        const lista = document.querySelector("#lista");
+        const contadorTotal = document.querySelector("#contador-total");
+        const contador = document.querySelector("#contador");
+        const contadorCompletadas = document.querySelector("#contador-completadas");
+        const mensaje = document.querySelector("#mensaje");
+        const vacio = document.querySelector("#vacio");
+        const botonEliminarCompletadas = document.querySelector("#eliminar-completadas");
+        const botonTema = document.querySelector("#toggle-tema");
+        const botonesFiltro = document.querySelectorAll(".filtros button");
+
+        const CLAVE_ALMACEN = "tareas-barreras";
+
+        let tareas = [];
+        let filtroActual = "todas";
+
+        function aplicarTema(oscuro) {
+            document.body.classList.toggle("modo-oscuro", oscuro);
+            botonTema.setAttribute("aria-pressed", String(oscuro));
+            botonTema.textContent = oscuro ? "Modo claro" : "Modo oscuro";
+        }
+
+        function guardarTareas() {
+            localStorage.setItem(CLAVE_ALMACEN, JSON.stringify(tareas));
+        }
+
+        function cargarTareas() {
+            const datos = localStorage.getItem(CLAVE_ALMACEN);
+            if (datos) {
+                try {
+                    tareas = JSON.parse(datos);
+                } catch (error) {
+                    tareas = [];
+                }
+            }
+        }
+
+        function formatearFecha(valor) {
+            if (!valor) {
+                return "";
+            }
+            const partes = valor.split("-");
+            const anio = partes[0];
+            const mes = partes[1];
+            const dia = partes[2];
+            return `${dia}/${mes}/${anio}`;
+        }
+
+        function obtenerTareasFiltradas() {
+            if (filtroActual === "pendientes") {
+                return tareas.filter(function (tarea) {
+                    return !tarea.completada;
+                });
+            }
+            if (filtroActual === "completadas") {
+                return tareas.filter(function (tarea) {
+                    return tarea.completada;
+                });
+            }
+            return tareas;
+        }
+
+        function actualizarContador() {
+            const total = tareas.length;
+            const completadas = tareas.filter(function (tarea) {
+                return tarea.completada;
+            }).length;
+            const pendientes = total - completadas;
+
+            contadorTotal.textContent = `Total: ${total}`;
+            contador.textContent = `Pendientes: ${pendientes}`;
+            contadorCompletadas.textContent = `Completadas: ${completadas}`;
+            botonEliminarCompletadas.hidden = completadas === 0;
+        }
+
+        function renderizarLista() {
+            lista.innerHTML = "";
+            const visibles = obtenerTareasFiltradas();
+
+            vacio.hidden = tareas.length > 0;
+
+            if (visibles.length === 0 && tareas.length > 0) {
+                vacio.hidden = false;
+                vacio.textContent = "No hay tareas en este filtro.";
+            } else {
+                vacio.textContent = "Todavía no tienes tareas.";
+            }
+
+            visibles.forEach(function (datosTarea) {
+                const tarea = document.createElement("li");
+                tarea.className = "tarea" + (datosTarea.completada ? " completada" : "");
+
+                const casilla = document.createElement("input");
+                casilla.type = "checkbox";
+                casilla.id = `tarea-${datosTarea.id}`;
+                casilla.checked = datosTarea.completada;
+
+                const contenedorTexto = document.createElement("div");
+                contenedorTexto.style.flex = "1";
+
+                const etiqueta = document.createElement("label");
+                etiqueta.htmlFor = casilla.id;
+                etiqueta.textContent = datosTarea.texto;
+
+                const datos = document.createElement("div");
+                datos.className = "datos-tarea";
+
+                if (datosTarea.fecha) {
+                    const etiquetaFecha = document.createElement("span");
+                    etiquetaFecha.className = "etiqueta-dato";
+                    etiquetaFecha.textContent = `Fecha: ${formatearFecha(datosTarea.fecha)}`;
+                    datos.append(etiquetaFecha);
+                }
+
+                const etiquetaPrioridad = document.createElement("span");
+                etiquetaPrioridad.className =
+                    "etiqueta-dato etiqueta-prioridad-" + datosTarea.prioridad;
+                etiquetaPrioridad.textContent =
+                    "Prioridad: " +
+                    datosTarea.prioridad.charAt(0).toUpperCase() +
+                    datosTarea.prioridad.slice(1);
+                datos.append(etiquetaPrioridad);
+
+                contenedorTexto.append(etiqueta, datos);
+
+                const botonEditar = document.createElement("button");
+                botonEditar.type = "button";
+                botonEditar.className = "btn-editar-tarea";
+                botonEditar.textContent = "Editar";
+                botonEditar.setAttribute("aria-label", "Editar tarea: " + datosTarea.texto);
+
+                const botonEliminar = document.createElement("button");
+                botonEliminar.type = "button";
+                botonEliminar.className = "btn-eliminar-tarea";
+                botonEliminar.textContent = "Eliminar";
+                botonEliminar.setAttribute("aria-label", "Eliminar tarea: " + datosTarea.texto);
+
+                casilla.addEventListener("change", function () {
+                    datosTarea.completada = casilla.checked;
+                    tarea.classList.toggle("completada", casilla.checked);
+                    guardarTareas();
+                    actualizarContador();
+
+                    if (
+                        (filtroActual === "pendientes" && casilla.checked) ||
+                        (filtroActual === "completadas" && !casilla.checked)
+                    ) {
+                        renderizarLista();
+                    }
+                });
+
+                botonEditar.addEventListener("click", function () {
+                    const nuevoTexto = prompt("Editar tarea:", datosTarea.texto);
+                    if (nuevoTexto === null) {
+                        return;
+                    }
+                    const textoLimpio = nuevoTexto.trim();
+                    if (textoLimpio === "") {
+                        mensaje.textContent = "El nombre de la tarea no puede estar vacío.";
+                        return;
+                    }
+                    datosTarea.texto = textoLimpio;
+                    guardarTareas();
+                    renderizarLista();
+                    mensaje.textContent = "Tarea editada correctamente.";
+                });
+
+                botonEliminar.addEventListener("click", function () {
+                    tarea.classList.add("eliminando");
+                    setTimeout(function () {
+                        tareas = tareas.filter(function (elemento) {
+                            return elemento.id !== datosTarea.id;
+                        });
+                        guardarTareas();
+                        renderizarLista();
+                        actualizarContador();
+                        mensaje.textContent = "Tarea eliminada.";
+                    }, 250);
+                });
+
+                tarea.append(casilla, contenedorTexto, botonEditar, botonEliminar);
+                lista.append(tarea);
+            });
+
+            actualizarContador();
+        }
+
+        botonTema.addEventListener("click", function () {
+            const oscuro = !document.body.classList.contains("modo-oscuro");
+            aplicarTema(oscuro);
+        });
+
+        botonesFiltro.forEach(function (boton) {
+            boton.addEventListener("click", function () {
+                filtroActual = boton.dataset.filtro;
+                botonesFiltro.forEach(function (elemento) {
+                    elemento.setAttribute(
+                        "aria-pressed",
+                        String(elemento === boton)
+                    );
+                });
+                renderizarLista();
+            });
+        });
+
+        formulario.addEventListener("submit", function (evento) {
+            evento.preventDefault();
+            const texto = nombre.value.trim();
+
+            if (texto === "") {
+                mensaje.textContent = "Escribe el nombre de la tarea.";
+                nombre.focus();
+                return;
+            }
+
+            tareas.push({
+                id: Date.now(),
+                texto: texto,
+                completada: false,
+                fecha: fecha.value,
+                prioridad: prioridad.value
+            });
+
+            guardarTareas();
+            formulario.reset();
+            renderizarLista();
+            mensaje.textContent = "Tarea agregada correctamente.";
+            nombre.focus();
+        });
+
+        botonEliminarCompletadas.addEventListener("click", function () {
+            const cantidad = tareas.filter(function (tarea) {
+                return tarea.completada;
+            }).length;
+
+            if (cantidad === 0) {
+                return;
+            }
+
+            const confirmar = confirm(
+                "¿Seguro que quieres eliminar " + cantidad + " tarea(s) completada(s)?"
+            );
+
+            if (!confirmar) {
+                return;
+            }
+
+            tareas = tareas.filter(function (tarea) {
+                return !tarea.completada;
+            });
+
+            guardarTareas();
+            renderizarLista();
+            mensaje.textContent =
+                "Se eliminaron " + cantidad + " tarea(s) completada(s).";
+        });
+
+        const prefiereOscuro = window.matchMedia("(prefers-color-scheme: dark)");
+        aplicarTema(prefiereOscuro.matches);
+        prefiereOscuro.addEventListener("change", function (evento) {
+            aplicarTema(evento.matches);
+        });
+
+        cargarTareas();
+        renderizarLista();
+    </script>
+</body>
+
+</html>
